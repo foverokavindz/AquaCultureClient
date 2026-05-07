@@ -3,6 +3,8 @@ import MainLayout from '../layouts/MainLayout';
 import Dashboard from '../pages/Dashboard';
 import FishFarms from '../pages/FishFarms';
 import Workers from '../pages/Workers';
+import FishFarmDetails from '../pages/FishFarmDetails';
+import WorkerDetails from '../pages/WorkerDetails';
 
 import SideNavBar from '../components/SideNavBar';
 import { MAIN_NAV_ITEMS } from '../config/navigation';
@@ -24,8 +26,16 @@ const routes: RouteObject[] = [
 				element: <FishFarms />,
 			},
 			{
+				path: 'fish-farms/:id',
+				element: <FishFarmDetails />,
+			},
+			{
 				path: 'workers',
 				element: <Workers />,
+			},
+			{
+				path: 'workers/:id',
+				element: <WorkerDetails />,
 			},
 		],
 	},
