@@ -1,15 +1,342 @@
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import Slider from '@mui/material/Slider';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Search } from 'lucide-react';
+import FishFarmCard from '../components/FishFarmCard';
+import { CircularProgress, Stack, Alert } from '@mui/material';
+import ViewToggle from '../components/ViewToggle';
+import FishFarmQuickView from '../components/FishFarmQuickView';
+import type { FishFarmDto, SearchFishFarmDto } from '../types/services.types';
+import { FISH_FARM_SORT_BY } from '../types/common.types';
+import { fishFarmService } from '../services/FishFarm.service';
+import NoDataImage from '../assets/noData.svg';
+
+export const DUMMY_DATA = [
+	{
+		id: 'farm-1',
+		name: 'Nordic Sea Farm Alpha',
+		latitude: 68.3245,
+		longitude: 14.2341,
+		cagesCount: 12,
+		hasBarge: true,
+		imageUrl: '/fish_farm_demo.png',
+	},
+	{
+		id: 'farm-2',
+		name: 'Trondheim Coastal Facility',
+		latitude: 63.4305,
+		longitude: 10.3951,
+		cagesCount: 8,
+		hasBarge: false,
+		imageUrl: '/fish_farm_demo.png',
+	},
+	{
+		id: 'farm-3',
+		name: 'Bergen Deep Water Site',
+		latitude: 60.3928,
+		longitude: 5.3221,
+		cagesCount: 24,
+		hasBarge: true,
+		imageUrl: '/fish_farm_demo.png',
+	},
+];
 
 function FishFarms() {
+	const navigate = useNavigate();
+	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+	const [previewFarmId, setPreviewFarmId] = useState<string | null>(null);
+	const [fishFarmData, setFishFarmData] = useState<FishFarmDto[]>([]);
+	const [fishFarmDataLoading, setFishFarmDataLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [searchAndFilter, setSearchAndFilter] = useState<SearchFishFarmDto>({
+		searchTerm: '',
+		hasBarge: undefined,
+		minAvailableCages: undefined,
+		maxAvailableCages: undefined,
+		sortBy: FISH_FARM_SORT_BY['Name (A-Z)'],
+	});
+
+	const fetchFishFarmsData = async () => {
+		setError(null);
+		setFishFarmDataLoading(true);
+
+		const response = await fishFarmService.GetAllFishFarmsWithWorkers();
+
+		if (response.success && response.data) {
+			setFishFarmData(response.data);
+		} else {
+			console.error('Get FishFarms Error:', response.message);
+			setError(response.message);
+		}
+
+		setFishFarmDataLoading(false);
+	};
+
+	const handleViewModeChange = (_: React.MouseEvent<HTMLElement>, newMode: 'grid' | 'list') => {
+		setViewMode(newMode);
+	};
+
+	const selectedFarm = fishFarmData?.find((f) => f.id === previewFarmId) || null;
+
+	useEffect(() => {
+		fetchFishFarmsData();
+	}, []);
+
 	return (
-		<Box sx={{ minHeight: '100vh', p: 4 }}>
-			<Typography variant="h4" sx={{ fontWeight: 600 }}>
-				Fish Farms
-			</Typography>
-			<Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-				Manage your fish farm operations
-			</Typography>
+		<Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', p: 3, pb: 0 }}>
+			<Box sx={{ flexShrink: 0 }}>
+				{/* Heading area*/}
+				<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+					{/* heading */}
+					<Box>
+						<Typography variant="h4" sx={{ fontWeight: 700 }}>
+							Fish Farms
+						</Typography>
+						<Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
+							Manage your active aquaculture sites
+						</Typography>
+					</Box>
+
+					{/* actions */}
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+						{/* search bar */}
+						<TextField
+							placeholder="Search fish farms..."
+							variant="outlined"
+							size="small"
+							sx={{ width: 300, '& .MuiOutlinedInput-root': { bgcolor: 'background.paper' } }}
+							slotProps={{
+								input: {
+									startAdornment: (
+										<InputAdornment position="start">
+											<Search size={20} />
+										</InputAdornment>
+									),
+								},
+							}}
+						/>
+
+						{/* Add New Button */}
+						<Button variant="contained" startIcon={<Plus size={20} />} sx={{ fontWeight: 600 }}>
+							Add New
+						</Button>
+					</Box>
+				</Box>
+
+				<Divider sx={{ mb: 2 }} />
+
+				{/* Filters */}
+
+				{!fishFarmDataLoading && !error && fishFarmData.length > 0 && (
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+							{/* Has Barge Dropdown */}
+							<FormControl size="small" sx={{ minWidth: 130 }}>
+								<Stack
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+										justifyContent: 'center',
+										alignItems: 'center',
+										gap: 1,
+									}}
+								>
+									<Typography variant="body2" sx={{ fontWeight: 500 }}>
+										Barge Avilability:
+									</Typography>
+									<Select
+										labelId="has-barge-label"
+										label="Has Barge"
+										defaultValue="all"
+										displayEmpty
+										sx={{
+											'& legend': {
+												display: 'none',
+											},
+										}}
+									>
+										<MenuItem value="all">All</MenuItem>
+										<MenuItem value="yes">With Barge</MenuItem>
+										<MenuItem value="no">Without Barge</MenuItem>
+									</Select>
+								</Stack>
+							</FormControl>
+
+							{/* Cages Range */}
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: 250 }}>
+								<Stack
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+										justifyContent: 'center',
+										alignItems: 'center',
+										gap: 2,
+									}}
+								>
+									<Typography variant="body2" sx={{ fontWeight: 500, textWrap: 'nowrap' }}>
+										Cage Capacity:
+									</Typography>
+									<Slider
+										defaultValue={[0, 50]}
+										valueLabelDisplay="auto"
+										min={0}
+										max={100}
+										size="small"
+										sx={{
+											minWidth: 100,
+										}}
+									/>
+								</Stack>
+							</Box>
+
+							{/* Sort By */}
+							<FormControl size="small" sx={{ minWidth: 150 }}>
+								<Stack
+									sx={{
+										display: 'flex',
+										flexDirection: 'row',
+										justifyContent: 'center',
+										alignItems: 'center',
+										gap: 1,
+									}}
+								>
+									<Typography variant="body2" sx={{ fontWeight: 500, textWrap: 'nowrap' }}>
+										Sort by:{' '}
+									</Typography>
+
+									<Select
+										labelId="sort-by-label"
+										label="Sort By"
+										defaultValue="name"
+										// sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
+										sx={{
+											'& legend': {
+												display: 'none',
+											},
+										}}
+									>
+										<MenuItem value="name">Name (A-Z)</MenuItem>
+										<MenuItem value="cages_high">Cages (High - Low)</MenuItem>
+										<MenuItem value="cages_low">Cages (Low - High)</MenuItem>
+									</Select>
+								</Stack>
+							</FormControl>
+						</Box>
+
+						{/* View Toggle */}
+						<ViewToggle viewMode={viewMode} onChange={handleViewModeChange} />
+					</Box>
+				)}
+			</Box>
+
+			{/* content area */}
+			<Box sx={{ flexGrow: 1, overflowY: 'auto', pb: { xs: 3, md: 5 }, pr: 1 }}>
+				{fishFarmDataLoading && (
+					<Box
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							height: '100%',
+							p: 4,
+						}}
+					>
+						<CircularProgress />
+					</Box>
+				)}
+				{!fishFarmDataLoading && error && (
+					<Box
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							height: '100%',
+							p: 4,
+						}}
+					>
+						<Alert severity="error" variant="outlined" sx={{ width: '100%', maxWidth: 500 }}>
+							{error}
+						</Alert>
+					</Box>
+				)}
+				{!fishFarmDataLoading && !error && fishFarmData.length === 0 && (
+					<Box
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							height: '100%',
+							width: '100%',
+							p: 4,
+						}}
+					>
+						<Stack
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								gap: 2,
+							}}
+						>
+							<img src={NoDataImage} alt="No Data" width={150} height={150} />
+
+							<Stack
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'center',
+									gap: 0.5,
+								}}
+							>
+								<Typography variant="h6" color="textSecondary">
+									No results found
+								</Typography>
+								{/* <Typography variant="body2" color="textSecondary">
+									We can't find any item matching your search.{' '}
+								</Typography> */}
+							</Stack>
+						</Stack>
+					</Box>
+				)}
+				{!fishFarmDataLoading && !error && fishFarmData.length > 0 && (
+					<Grid container spacing={viewMode === 'list' ? 2 : 4}>
+						{fishFarmData.map((farm) => (
+							<Grid size={viewMode === 'list' ? { xs: 12 } : { xs: 12, sm: 6, lg: 4 }} key={farm.id}>
+								<FishFarmCard
+									id={farm.id}
+									name={farm.name}
+									latitude={farm.latitude}
+									longitude={farm.longitude}
+									cagesCount={farm.noOfCages}
+									hasBarge={farm.hasBarge}
+									imageUrl={farm.pictureUrl}
+									viewMode={viewMode}
+									onView={() => navigate(`/fish-farms/${farm.id}`)}
+									onPreview={() => setPreviewFarmId(farm.id)}
+								/>
+							</Grid>
+						))}
+					</Grid>
+				)}
+			</Box>
+
+			{/* Quick View Drawer */}
+			<FishFarmQuickView
+				open={!!previewFarmId}
+				farm={selectedFarm}
+				onClose={() => setPreviewFarmId(null)}
+				onExpand={(id) => navigate(`/fish-farms/${id}`)}
+			/>
 		</Box>
 	);
 }
