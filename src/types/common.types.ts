@@ -18,3 +18,12 @@ export interface ClientTypeMap {
 	axios: AxiosRequestConfig;
 	// fetch: RequestInit;
 }
+
+export const FISH_FARM_SORT_BY = {
+	'Name (A-Z)': 'name_asc',
+	'Name (Z-A)': 'name_desc',
+	'Cages (High - Low)': 'cages_desc',
+	'Cages (Low - High)': 'cages_asc',
+} as const;
+
+export type FishFarmSortOrderType = (typeof FISH_FARM_SORT_BY)[keyof typeof FISH_FARM_SORT_BY];

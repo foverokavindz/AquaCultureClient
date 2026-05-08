@@ -37,7 +37,8 @@ export class AxiosClient implements IApiClient {
 				return config;
 			},
 			async (error: AxiosError) => {
-				return this.handleError(error);
+				this.handleError(error);
+				return Promise.reject(error);
 			}
 		);
 
@@ -50,7 +51,8 @@ export class AxiosClient implements IApiClient {
 				return response;
 			},
 			async (error: AxiosError) => {
-				return this.handleError(error);
+				this.handleError(error);
+				return Promise.reject(error);
 			}
 		);
 	}
