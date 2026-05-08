@@ -7,7 +7,7 @@ import FishFarmDetails from '../pages/FishFarmDetails';
 import WorkerDetails from '../pages/WorkerDetails';
 
 import SideNavBar from '../components/SideNavBar';
-import { MAIN_NAV_ITEMS } from '../config/navigation';
+import { MAIN_NAV_ITEMS } from '../configs/navigation';
 
 const routes: RouteObject[] = [
 	{
