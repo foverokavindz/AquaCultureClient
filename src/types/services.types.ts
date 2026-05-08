@@ -48,7 +48,7 @@ export interface AssignWorkersDto {
 	}[];
 }
 
-export interface SearchFishFarmDto {
+export interface SearchFishFarmRequestDto {
 	searchTerm?: string;
 	hasBarge?: boolean;
 	minAvailableCages?: number;

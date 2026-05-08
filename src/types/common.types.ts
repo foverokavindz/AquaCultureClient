@@ -27,3 +27,13 @@ export const FISH_FARM_SORT_BY = {
 } as const;
 
 export type FishFarmSortOrderType = (typeof FISH_FARM_SORT_BY)[keyof typeof FISH_FARM_SORT_BY];
+
+export interface SearchFishFarm {
+	searchTerm?: string;
+	hasBarge?: boolean;
+	avialableCagesRange?: {
+		max: number;
+		min: number;
+	};
+	sortBy?: FishFarmSortOrderType;
+}

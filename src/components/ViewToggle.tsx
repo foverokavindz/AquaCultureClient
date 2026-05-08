@@ -5,9 +5,10 @@ import { LayoutGrid, List as ListIcon } from 'lucide-react';
 interface ViewToggleProps {
 	viewMode: 'grid' | 'list';
 	onChange: (event: React.MouseEvent<HTMLElement>, newMode: 'grid' | 'list') => void;
+	disabled?: boolean;
 }
 
-const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, onChange }) => {
+const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, onChange, disabled }) => {
 	return (
 		<Stack
 			sx={{
@@ -21,7 +22,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, onChange }) => {
 			<Typography variant="body2" sx={{ fontWeight: 500 }}>
 				View as :
 			</Typography>
-			<ToggleButtonGroup value={viewMode} exclusive onChange={onChange} size="small">
+			<ToggleButtonGroup value={viewMode} exclusive onChange={onChange} size="small" disabled={disabled}>
 				<ToggleButton value="grid" aria-label="grid view">
 					<LayoutGrid size={18} />
 				</ToggleButton>

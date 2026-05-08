@@ -4,7 +4,7 @@ import type {
 	FishFarmDto,
 	UpdateFishFarmDto,
 	AssignWorkersDto,
-	SearchFishFarmDto,
+	SearchFishFarmRequestDto,
 } from '../types/services.types';
 import type { ApiResponse } from '../types/common.types';
 import { getApiClient } from '../api/AxiosClient';
@@ -40,7 +40,7 @@ export class FishFarmService {
 		return await this.api.post<FishFarmDto>(`/FishFarm/assign-workers`, data);
 	}
 
-	public async SearchFishFarms(params: SearchFishFarmDto): Promise<ApiResponse<FishFarmDto[]>> {
+	public async SearchFishFarms(params: SearchFishFarmRequestDto): Promise<ApiResponse<FishFarmDto[]>> {
 		return await this.api.get<FishFarmDto[]>(`/FishFarm/search`, { params });
 	}
 }
