@@ -1,13 +1,8 @@
 import type { IApiClient } from '../api/IApiClient';
-import type {
-	CreateFishFarmDto,
-	FishFarmDto,
-	UpdateFishFarmDto,
-	AssignWorkersDto,
-	SearchFishFarmRequestDto,
-} from '../types/services.types';
-import type { ApiResponse } from '../types/common.types';
 import { getApiClient } from '../api/AxiosClient';
+import type { ApiResponse } from '../types/api.types';
+import type { FishFarm, CreateFishFarm, UpdateFishFarm, SearchFishFarmRequest } from '../types/fishfarm.types';
+import type { AssignWorkers } from '../types/worker.types';
 
 export class FishFarmService {
 	private api: IApiClient;
@@ -16,32 +11,32 @@ export class FishFarmService {
 		this.api = api;
 	}
 
-	public async GetAllFishFarmsWithWorkers(): Promise<ApiResponse<FishFarmDto[]>> {
-		return await this.api.get<FishFarmDto[]>(`/FishFarm`);
+	public async GetAllFishFarmsWithWorkers(): Promise<ApiResponse<FishFarm[]>> {
+		return await this.api.get<FishFarm[]>(`/FishFarm`);
 	}
 
-	public async AddNewFishFarm(newFishFarm: CreateFishFarmDto): Promise<ApiResponse<FishFarmDto[]>> {
-		return await this.api.post<FishFarmDto[]>(`/FishFarm`, newFishFarm);
+	public async AddNewFishFarm(newFishFarm: CreateFishFarm): Promise<ApiResponse<FishFarm[]>> {
+		return await this.api.post<FishFarm[]>(`/FishFarm`, newFishFarm);
 	}
 
-	public async GetFishFarmByIdWithWorkers(id: string): Promise<ApiResponse<FishFarmDto>> {
-		return await this.api.get<FishFarmDto>(`/FishFarm/${id}`);
+	public async GetFishFarmByIdWithWorkers(id: string): Promise<ApiResponse<FishFarm>> {
+		return await this.api.get<FishFarm>(`/FishFarm/${id}`);
 	}
 
-	public async UpdateFishFarm(id: string, updateData: UpdateFishFarmDto): Promise<ApiResponse<FishFarmDto>> {
-		return await this.api.put<FishFarmDto>(`/FishFarm/${id}`, updateData);
+	public async UpdateFishFarm(id: string, updateData: UpdateFishFarm): Promise<ApiResponse<FishFarm>> {
+		return await this.api.put<FishFarm>(`/FishFarm/${id}`, updateData);
 	}
 
 	public async DeleteFishFarm(id: string): Promise<ApiResponse<null>> {
 		return await this.api.delete<null>(`/FishFarm/${id}`);
 	}
 
-	public async AssignWorkersToFishFarm(data: AssignWorkersDto): Promise<ApiResponse<FishFarmDto>> {
-		return await this.api.post<FishFarmDto>(`/FishFarm/assign-workers`, data);
+	public async AssignWorkersToFishFarm(data: AssignWorkers): Promise<ApiResponse<FishFarm>> {
+		return await this.api.post<FishFarm>(`/FishFarm/assign-workers`, data);
 	}
 
-	public async SearchFishFarms(params: SearchFishFarmRequestDto): Promise<ApiResponse<FishFarmDto[]>> {
-		return await this.api.get<FishFarmDto[]>(`/FishFarm/search`, { params });
+	public async SearchFishFarms(params: SearchFishFarmRequest): Promise<ApiResponse<FishFarm[]>> {
+		return await this.api.get<FishFarm[]>(`/FishFarm/search`, { params });
 	}
 }
 

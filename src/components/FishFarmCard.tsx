@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-	Card,
-	CardMedia,
-	CardContent,
-	CardActions,
-	Button,
-	Typography,
-	Box,
-	IconButton,
-	Chip,
-	Stack,
-} from '@mui/material';
+import { Card, CardMedia, CardContent, CardActions, Button, Typography, Box, IconButton, Chip, Stack } from '@mui/material';
 import { MapPin, Grid, Ship, Eye } from 'lucide-react';
 import { useTheme } from '@mui/material/styles';
 

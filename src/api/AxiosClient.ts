@@ -1,7 +1,7 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios';
 import type { IApiClient } from './IApiClient';
-import type { ApiClientConfig, ApiResponse, ClientTypeMap } from '../types/common.types';
 import { apiConfig } from '../configs/api.config';
+import type { ApiClientConfig, ApiResponse, ClientTypeMap } from '../types/api.types';
 
 export class AxiosClient implements IApiClient {
 	private static instance: AxiosClient | null = null;
@@ -28,16 +28,12 @@ export class AxiosClient implements IApiClient {
 	}
 
 	private setupInterceptors(): void {
+		// Request interceptor - Set up request headers
 		this.axiosInstance.interceptors.request.use(
 			(config) => {
-				// if (process.env.NODE_ENV === 'development') {
-				// 	console.log('Request:', config.method?.toUpperCase(), config.url);
-				// }
-
 				return config;
 			},
 			async (error: AxiosError) => {
-				this.handleError(error);
 				return Promise.reject(error);
 			}
 		);
@@ -45,18 +41,15 @@ export class AxiosClient implements IApiClient {
 		// Response interceptor - handle errors globally
 		this.axiosInstance.interceptors.response.use(
 			(response) => {
-				// if (process.env.NODE_ENV === 'development') {
-				// 	console.log('Response:', response.status, response.config.url);
-				// }
 				return response;
 			},
 			async (error: AxiosError) => {
-				this.handleError(error);
 				return Promise.reject(error);
 			}
 		);
 	}
 
+	// Handles API errors
 	private async handleError(error: AxiosError): Promise<ApiResponse<null>> {
 		if (error.response) {
 			// Server responded with error
@@ -64,7 +57,7 @@ export class AxiosClient implements IApiClient {
 
 			return response;
 		} else if (error.request) {
-			// Request made but no response
+			// Request sent but no reply
 			return {
 				success: false,
 				data: null,
@@ -74,7 +67,7 @@ export class AxiosClient implements IApiClient {
 				timestamp: new Date().toISOString(),
 			};
 		} else {
-			// Something else happened
+			// Something else happened, Request never sent
 			return {
 				success: false,
 				data: null,

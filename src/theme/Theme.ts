@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 
 const FONT_PRIMARY = 'Inter, sans-serif';
 
-// Extend the Palette interface to include custom colors
+// Extending palette interface to include custom colors
 declare module '@mui/material/styles' {
 	interface Palette {
 		border: Palette['primary'];
@@ -268,7 +268,6 @@ export const theme = createTheme({
 				},
 			},
 			styleOverrides: {
-				// TODO not working
 				root: {
 					'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
 						borderColor: 'divider',

@@ -39,6 +39,10 @@ const routes: RouteObject[] = [
 			},
 		],
 	},
+	{
+		path: '*',
+		element: <Navigate to="/dashboard" replace />,
+	},
 ];
 
 export const router = createBrowserRouter(routes);

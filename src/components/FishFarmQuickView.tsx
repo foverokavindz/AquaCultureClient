@@ -1,12 +1,12 @@
 import React from 'react';
 import { Drawer, Box, Typography, IconButton, Divider, Stack, Avatar, Chip } from '@mui/material';
 import { X, Maximize2, MapPin, Grid, Ship } from 'lucide-react';
-import type { FishFarmDto } from '../types/services.types';
+import type { FishFarm } from '../types/fishfarm.types';
 const DRAWER_WIDTH = 700;
 
 interface FishFarmQuickViewProps {
 	open: boolean;
-	farm: FishFarmDto | null;
+	farm: FishFarm | null;
 	onClose: () => void;
 	onExpand: (id: string) => void;
 }
@@ -112,9 +112,7 @@ const FishFarmQuickView: React.FC<FishFarmQuickViewProps> = ({ open, farm, onClo
 						<Stack spacing={3}>
 							{/* GPS */}
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-								<Box
-									sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}
-								>
+								<Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}>
 									<MapPin size={22} />
 								</Box>
 								<Box>
@@ -131,9 +129,7 @@ const FishFarmQuickView: React.FC<FishFarmQuickViewProps> = ({ open, farm, onClo
 
 							{/* Cages */}
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-								<Box
-									sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}
-								>
+								<Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}>
 									<Grid size={22} />
 								</Box>
 								<Box>
@@ -150,9 +146,7 @@ const FishFarmQuickView: React.FC<FishFarmQuickViewProps> = ({ open, farm, onClo
 
 							{/* Barge */}
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-								<Box
-									sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}
-								>
+								<Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}>
 									<Ship size={22} />
 								</Box>
 								<Box>
@@ -170,16 +164,13 @@ const FishFarmQuickView: React.FC<FishFarmQuickViewProps> = ({ open, farm, onClo
 
 						{/* Crew Section */}
 						<Box>
-							<Typography
-								variant="subtitle2"
-								sx={{ mb: 2, fontWeight: 600 }}
-							>
+							<Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
 								Crew workers
 							</Typography>
 							<Stack spacing={2}>
 								{farm.workers && farm.workers.length > 0 ? (
 									farm.workers.map((worker) => {
-										const role = getRoleDetails(worker.position);
+										const role = getRoleDetails(worker.position as number);
 										return (
 											<Box key={worker.id} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 												<Avatar src={worker.profileImageUrl} alt={worker.name} sx={{ width: 40, height: 40 }} />
@@ -191,9 +182,16 @@ const FishFarmQuickView: React.FC<FishFarmQuickViewProps> = ({ open, farm, onClo
 														{worker.email}
 													</Typography>
 												</Box>
-												<Chip label={<Typography variant="caption" sx={{ fontWeight: 600 }}>
-													{role.label}
-												</Typography>} size="small" color={role.color} variant="outlined" />
+												<Chip
+													label={
+														<Typography variant="caption" sx={{ fontWeight: 600 }}>
+															{role.label}
+														</Typography>
+													}
+													size="small"
+													color={role.color}
+													variant="outlined"
+												/>
 											</Box>
 										);
 									})
