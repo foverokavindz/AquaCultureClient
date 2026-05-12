@@ -22,6 +22,7 @@ import { CREW_ROLE_OPTIONS } from '../types/common.types';
 import { extractCloudinaryPublicId } from '../utils/utils';
 import type { CreateFishFarm, FishFarm, UpdateFishFarm } from '../types/fishfarm.types';
 import type { CrewWorker } from '../types/worker.types';
+import toast from 'react-hot-toast';
 
 const DRAWER_WIDTH = 550;
 
@@ -314,22 +315,27 @@ const FishFarmFormDrawer: React.FC<FishFarmFormDrawerProps> = ({ open, onClose, 
 
 	const handleSubmit = async () => {
 		setSaving(true);
+		const toastId = toast.loading(isEditMode ? 'Saving changes...' : 'Creating fish farm...');
 
 		if (isEditMode && fishFarm) {
 			const response = await fishFarmService.UpdateFishFarm(fishFarm.id, formData as UpdateFishFarm);
 			if (response.success && response.data) {
 				onSaved?.();
+				toast.success('Fish farm updated successfully!', { id: toastId });
 				onClose();
 			} else {
+				toast.error(`Failed to update fish farm ${response.message}`, { id: toastId });
 				console.error('Update FishFarm Error:', response.message);
 			}
 		} else {
 			const response = await fishFarmService.AddNewFishFarm(formData);
 			if (response.success && response.data) {
 				onSaved?.();
+				toast.success('Fish farm created successfully!', { id: toastId });
 				resetForm();
 				onClose();
 			} else {
+				toast.error(`Failed to create fish farm ${response.message}`, { id: toastId });
 				console.error('Create FishFarm Error:', response.message);
 			}
 		}
@@ -359,8 +365,7 @@ const FishFarmFormDrawer: React.FC<FishFarmFormDrawerProps> = ({ open, onClose, 
 
 	const requiredMark = <span style={{ color: 'tomato' }}> *</span>;
 
-
-	console.log("Error :", errors);
+	console.log('Error :', errors);
 
 	return (
 		<Drawer

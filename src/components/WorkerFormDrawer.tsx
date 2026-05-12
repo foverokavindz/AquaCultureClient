@@ -19,6 +19,7 @@ import { workerService } from '../services/Worker.service';
 import { fileUploaderService } from '../services/FileUploader.service';
 import { CREW_ROLE_OPTIONS, CREW_ROLE_POSITION } from '../types/common.types';
 import { extractCloudinaryPublicId } from '../utils/utils';
+import toast from 'react-hot-toast';
 
 const DRAWER_WIDTH = 550;
 
@@ -179,22 +180,27 @@ const WorkerFormDrawer: React.FC<WorkerFormDrawerProps> = ({ open, onClose, work
 		if (Object.keys(allErrors).length > 0) return;
 
 		setSaving(true);
+		const toastId = toast.loading(isEditMode ? 'Saving changes...' : 'Creating worker...');
 
 		if (isEditMode && worker) {
 			const response = await workerService.UpdateWorker(worker.id, formData);
 			if (response.success && response.data) {
 				onSaved?.(response.data);
+				toast.success('Worker updated successfully!', { id: toastId });
 				onClose();
 			} else {
+				toast.error(`Failed to update worker ${response.message}`, { id: toastId });
 				console.error('Update Worker Error:', response.message);
 			}
 		} else {
 			const response = await workerService.CreateWorker(formData);
 			if (response.success && response.data) {
 				onSaved?.(response.data);
+				toast.success('Worker created successfully!', { id: toastId });
 				resetForm();
 				onClose();
 			} else {
+				toast.error(`Failed to create worker ${response.message}`, { id: toastId });
 				console.error('Create Worker Error:', response.message);
 			}
 		}

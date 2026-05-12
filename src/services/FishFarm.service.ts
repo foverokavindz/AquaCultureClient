@@ -27,8 +27,8 @@ export class FishFarmService {
 		return await this.api.put<FishFarm>(`/FishFarm/${id}`, updateData);
 	}
 
-	public async DeleteFishFarm(id: string): Promise<ApiResponse<null>> {
-		return await this.api.delete<null>(`/FishFarm/${id}`);
+	public async DeleteFishFarm(id: string): Promise<ApiResponse<boolean>> {
+		return await this.api.delete<boolean>(`/FishFarm/${id}`);
 	}
 
 	public async AssignWorkersToFishFarm(data: AssignWorkers): Promise<ApiResponse<FishFarm>> {

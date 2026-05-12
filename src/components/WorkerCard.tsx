@@ -74,7 +74,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, viewMode, onViewClick, 
 							<Typography variant="h6" sx={{ fontWeight: 700 }} noWrap>
 								{worker.name}
 							</Typography>
-							<Chip label={positionLabel} color={getPositionColor(worker.position as number) as any} size="small" sx={{ fontWeight: 600 }} />
+							<Chip
+								label={positionLabel}
+								color={getPositionColor(worker.position as number) as any}
+								size="small"
+								sx={{ fontWeight: 600 }}
+							/>
 							{expired && (
 								<Chip
 									icon={<AlertTriangle size={12} />}
@@ -218,7 +223,12 @@ const WorkerCard: React.FC<WorkerCardProps> = ({ worker, viewMode, onViewClick, 
 						boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
 					}}
 				/>
-				<Chip label={positionLabel} color={getPositionColor(worker.position as number) as any} size="small" sx={{ mb: 1.5, fontWeight: 600 }} />
+				<Chip
+					label={positionLabel}
+					color={getPositionColor(worker.position as number) as any}
+					size="small"
+					sx={{ mb: 1.5, fontWeight: 600 }}
+				/>
 
 				<Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
 					{worker.name}

@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Divider, Paper, Avatar, Chip, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Button, Divider, Paper, Avatar, Chip, CircularProgress, Alert, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { ArrowLeft, Mail, Ship, Edit2, Calendar, User, AlertTriangle, Briefcase } from 'lucide-react';
+import { ArrowLeft, Mail, Ship, Edit2, Calendar, User, AlertTriangle, Briefcase, Trash2 } from 'lucide-react';
 import WorkerFormDrawer from '../components/WorkerFormDrawer';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { workerService } from '../services/Worker.service';
 import type { CrewWorker } from '../types/worker.types';
 import { CREW_POSITION_LABELS } from '../types/common.types';
 import { getPositionColor, isCertExpired } from '../utils/utils';
+import toast from 'react-hot-toast';
 
 function WorkerDetails() {
 	const { id } = useParams();
@@ -17,6 +19,8 @@ function WorkerDetails() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	//  Fetch
 	const fetchWorker = async (workerId: string) => {
@@ -39,6 +43,23 @@ function WorkerDetails() {
 	const handleSaved = (savedWorker: CrewWorker) => {
 		setWorker(savedWorker);
 		setIsEditDrawerOpen(false);
+	};
+
+	const handleDelete = async () => {
+		if (!id) return;
+		setIsDeleting(true);
+		const toastId = toast.loading(`Deleting ${worker?.name}...`);
+
+		const response = await workerService.DeleteWorker(id);
+		if (response.success) {
+			toast.success('Worker deleted successfully!', { id: toastId });
+			navigate('/workers');
+		} else {
+			toast.error(response.message, { id: toastId });
+			console.error('Delete Worker Error:', response.message);
+			setIsDeleteDialogOpen(false);
+		}
+		setIsDeleting(false);
 	};
 
 	//  Loading
@@ -105,15 +126,28 @@ function WorkerDetails() {
 				>
 					Back to List
 				</Button>
-				<Button
-					variant="contained"
-					color="primary"
-					startIcon={<Edit2 size={18} />}
-					onClick={() => setIsEditDrawerOpen(true)}
-					sx={{ borderRadius: 1, fontWeight: 600 }}
-				>
-					Edit Worker
-				</Button>
+				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+					<Button
+						variant="contained"
+						color="primary"
+						startIcon={<Edit2 size={18} />}
+						onClick={() => setIsEditDrawerOpen(true)}
+						sx={{ borderRadius: 1, fontWeight: 600 }}
+					>
+						Edit Worker
+					</Button>
+					<Tooltip title="Delete Worker">
+						<IconButton
+							color="error"
+							onClick={() => setIsDeleteDialogOpen(true)}
+							sx={{
+								p: 1,
+							}}
+						>
+							<Trash2 size={18} />
+						</IconButton>
+					</Tooltip>
+				</Box>
 			</Box>
 
 			{/*  Scrollable Content */}
@@ -168,7 +202,12 @@ function WorkerDetails() {
 									<Typography variant="h3" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white' }}>
 										{worker.name}
 									</Typography>
-									<Chip label={positionLabel} color={getPositionColor(worker.position as number) as any} size="small" sx={{ fontWeight: 600 }} />
+									<Chip
+										label={positionLabel}
+										color={getPositionColor(worker.position as number) as any}
+										size="small"
+										sx={{ fontWeight: 600 }}
+									/>
 									{expired && (
 										<Chip icon={<AlertTriangle size={12} />} label="Cert Expired" size="small" color="warning" sx={{ fontWeight: 600 }} />
 									)}
@@ -316,6 +355,23 @@ function WorkerDetails() {
 			</Box>
 
 			<WorkerFormDrawer open={isEditDrawerOpen} onClose={() => setIsEditDrawerOpen(false)} worker={worker} onSaved={handleSaved} />
+
+			<ConfirmationModal
+				open={isDeleteDialogOpen}
+				onClose={() => setIsDeleteDialogOpen(false)}
+				onConfirm={handleDelete}
+				title="Delete Worker"
+				message={
+					<>
+						Are you sure you want to delete <strong>{worker.name}</strong>?
+					</>
+				}
+				confirmLabel="Delete"
+				confirmColor="error"
+				confirmIcon={<Trash2 size={16} />}
+				loading={isDeleting}
+				loadingLabel="Deleting"
+			/>
 		</Box>
 	);
 }

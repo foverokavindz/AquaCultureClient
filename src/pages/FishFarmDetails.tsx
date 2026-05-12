@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, CircularProgress, Alert, Paper, Stack } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Alert, Paper, Stack, Tooltip, IconButton } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { ArrowLeft, MapPin, Grid as GridIcon, Ship, Edit2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Grid as GridIcon, Ship, Edit2, Trash2 } from 'lucide-react';
 import AssignedCrew from '../components/AssignedCrew';
 import MapPreview from '../components/MapPreview';
 import { fishFarmService } from '../services/FishFarm.service';
 import FishFarmFormDrawer from '../components/FishFarmFormDrawer';
 import NoDataImage from '../assets/noData.svg';
 import type { FishFarm } from '../types/fishfarm.types';
+import ConfirmationModal from '../components/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 function FishFarmDetails() {
 	const [fishFarmData, setFishFarmData] = useState<FishFarm | null>(null);
 	const [fishFarmDataLoading, setFishFarmDataLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -33,6 +37,23 @@ function FishFarmDetails() {
 		}
 
 		setFishFarmDataLoading(false);
+	};
+
+	const handleDelete = async () => {
+		if (!id) return;
+		setIsDeleting(true);
+		const toastId = toast.loading(`Deleting ${fishFarmData?.name}...`);
+
+		const response = await fishFarmService.DeleteFishFarm(id);
+		if (response.success) {
+			toast.success('Fish Farm deleted successfully!', { id: toastId });
+			navigate('/fish-farms');
+		} else {
+			toast.error(response.message, { id: toastId });
+			console.error('Delete Fish Farm Error:', response.message);
+			setIsDeleteDialogOpen(false);
+		}
+		setIsDeleting(false);
 	};
 
 	useEffect(() => {
@@ -140,15 +161,28 @@ function FishFarmDetails() {
 							Back to List
 						</Button>
 
-						<Button
-							variant="contained"
-							color="primary"
-							startIcon={<Edit2 size={18} />}
-							onClick={() => setIsEditDrawerOpen(true)}
-							sx={{ borderRadius: 1, fontWeight: 600 }}
-						>
-							Edit Farm
-						</Button>
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+							<Button
+								variant="contained"
+								color="primary"
+								startIcon={<Edit2 size={18} />}
+								onClick={() => setIsEditDrawerOpen(true)}
+								sx={{ borderRadius: 1, fontWeight: 600 }}
+							>
+								Edit farm
+							</Button>
+							<Tooltip title="Delete Farm">
+								<IconButton
+									color="error"
+									onClick={() => setIsDeleteDialogOpen(true)}
+									sx={{
+										p: 1,
+									}}
+								>
+									<Trash2 size={18} />
+								</IconButton>
+							</Tooltip>
+						</Box>
 					</Box>
 
 					{/* Scrollable Content Area */}
@@ -299,6 +333,23 @@ function FishFarmDetails() {
 				onClose={() => setIsEditDrawerOpen(false)}
 				fishFarm={fishFarmData}
 				onSaved={() => fetchFishFarmsDataWithId(id as string)}
+			/>
+
+			<ConfirmationModal
+				open={isDeleteDialogOpen}
+				onClose={() => setIsDeleteDialogOpen(false)}
+				onConfirm={handleDelete}
+				title="Delete Fish Farm"
+				message={
+					<>
+						Are you sure you want to delete <strong>{fishFarmData?.name}</strong>?
+					</>
+				}
+				confirmLabel="Delete"
+				confirmColor="error"
+				confirmIcon={<Trash2 size={16} />}
+				loading={isDeleting}
+				loadingLabel="Deleting"
 			/>
 		</Box>
 	);

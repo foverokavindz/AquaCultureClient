@@ -1,4 +1,4 @@
-import type { ClientTypeMap, ApiResponse } from "../types/api.types";
+import type { ClientTypeMap, ApiResponse } from '../types/api.types';
 
 export interface IApiClient {
 	/**
